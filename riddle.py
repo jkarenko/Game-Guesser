@@ -2,26 +2,22 @@ import textwrap
 from random import choice
 
 import openai
+import re
 
 from games import Games
 
 MODEL = "gpt-3.5-turbo"
 
 
-def get_riddle():
-    game = choice(Games.get_games())
+def get_riddle(title: str, parameters: dict):
     return openai.ChatCompletion.create(
-        model=MODEL,
+        model=parameters["model"] if "model" in parameters else MODEL,
         messages=[
-            {"role": "system",
-             "content": "Olet PC pelien arvuuttaja. Keksi arvoituksia, jotka sisältävät pelin nimen synonyyminä, pelin asetelman, juonen, ympäristön, hahmot ja tavoitteet. Omaksu pelin päähahmon rooli kun esität arvoituksen. Älä paljasta paikkojen tai henkilöiden nimiä."},
-            {"role": "user", "content": "Overwatch"},
-            {"role": "assistant",
-             "content": "Tässä pelissä hyvä ja paha taistelevat, vaikkakin joskus myös samalla puolella. Kuolema ei ole pysyvä, vain hidaste, mutta et halua hidastetta kun sinulla on kiire päästä oman joukkueesi luokse ja kaapata hallintapiste tai palata saattotehtävään. Valitse yksi lukuisista sankareista ja taistele voittoon lentäen ja raketteja ampuen, juosten konetuliaseen laulaessa tai pysyttele taaempaana ja pidä ystäväsi elossa."},
-            {"role": "user", "content": f"{game}"},
+            {"role": "system", "content": parameters["system"]},
+            {"role": "user", "content": f"{parameters['prompt']} {title}"},
         ],
-        temperature=0,
-    ), game
+        temperature=parameters.get("temperature", 0.5),
+    )
 
 
 def levenshtein_distance(s1, s2):
@@ -53,17 +49,15 @@ class Riddle:
         self.game = game
         self.riddle = get_riddle()
         self.riddle = wrap_text(self.riddle)
-        self.answer = self.get_answer()
-        self.distance = self.levenshtein_distance(self.answer.lower(), self.game.lower())
-        self.score = self.get_score()
 
     @classmethod
-    def get_riddle(cls):
-        riddle, game = get_riddle()
+    def get_riddle(cls, title, parameters):
+        riddle = get_riddle(title, parameters)
         riddle = riddle['choices'][0]['message']['content']
-        riddle = wrap_text(riddle)
-        return riddle, game
+        return wrap_text(riddle)
 
     @staticmethod
     def distance(s1, s2):
+        pattern = r"\s\(\d{4}\)"
+        s2 = re.sub(pattern, "", s2)
         return levenshtein_distance(s1, s2)
