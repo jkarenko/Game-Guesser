@@ -49,7 +49,7 @@ question = "What is the name of the TV series?"
 [imdb-en]
 model = "gpt-3.5-turbo"
 temperature = 0.9
-files = ["title.basics.tsv"]
+files = ["title.basics.tsv", "title.ratings.tsv"]
 reader = "imdb"
 system = "You are the movie riddle master. Come up with riddles that may contain the movie name as a synonym, the movie setting, plot, environment and time period. Important: never reveal the names of places, people or movies in any case! Be as cryptic as possible and use a synonym if a word is in the movie's title."
 prompt = "Make a riddle about the movie"

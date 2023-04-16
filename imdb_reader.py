@@ -4,9 +4,14 @@ import urllib.request
 import pandas as pd
 
 
-def imdb_reader(file_name):
-    if not os.path.exists(file_name):
-        download_file(file_name)
+def imdb_reader(file_names):
+    for file_name in file_names:
+        if not os.path.exists(file_name):
+            download_file(file_name)
+
+    basics_file_name = file_names[0]
+    ratings_file_name = file_names[1]
+    # akas_file_name = file_names[2]
 
     dtype = {
         "tconst": str,
@@ -19,9 +24,12 @@ def imdb_reader(file_name):
         "genres": str
     }
 
-    df = pd.read_csv(file_name, dtype=dtype, sep="\t", low_memory=False, na_values="\\N")
-    df["genres"] = df["genres"].str.split(',')
-    filtered_df = df[(df["startYear"] > 1980) & (df["titleType"] == "movie")]
+    df_basics = pd.read_csv(basics_file_name, dtype=dtype, sep="\t", low_memory=False, na_values="\\N")
+    df_basics["genres"] = df_basics["genres"].str.split(',')
+    df_ratings = pd.read_csv(ratings_file_name, sep="\t", na_values="\\N")
+    # df_akas = pd.read_csv(akas_file_name, sep="\t", na_values="\\N")
+    df = pd.merge(df_basics, df_ratings, on='tconst')
+    filtered_df = df[(df_basics["startYear"] > 1980) & (df_basics["titleType"] == "movie") & (df_ratings["averageRating"] > 8.0) & (df_ratings["numVotes"] > 10000)]
     titles = filtered_df[["originalTitle", "startYear", "genres"]]
     sample_5 = titles.sample(5)
     return [f"{row.originalTitle} ({row.startYear})" for _, row in sample_5.iterrows()]

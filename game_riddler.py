@@ -22,7 +22,7 @@ class GameRiddler:
         self.questions = 5
 
     def main(self, selection):
-        os.system("cls" if os.name == "nt" else "clear")
+        # os.system("cls" if os.name == "nt" else "clear")
         self.answers, self.parameters = Games().get_games(selection)
         self.answers = sample(self.answers, k=self.questions)
 
