@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 import tomllib
-import imdb_reader
+from imdb_reader import IMDBReader
+
 
 @dataclass
 class Games:
+    reader = None
 
     @staticmethod
     def get_games(category_choice: str = None):
@@ -17,9 +19,10 @@ class Games:
             reader = parameters["reader"]
             print(f"reader: {reader}")
             if reader == "imdb":
-                print(f"Reading file {parameters['files']}")
-                answers = imdb_reader.imdb_reader(parameters["files"])
-
+                if Games.reader is None:
+                    print(f"Reading data from {parameters['files']}")
+                    Games.reader = IMDBReader(parameters["files"], parameters["type"])
+                answers = Games.reader.get_titles()
         else:
             answers = [line.strip() for file in parameters["files"] for line in open(file, 'r')]
 
