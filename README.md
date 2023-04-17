@@ -22,13 +22,25 @@
       3. Press `Enter`
 
 ### How to play
-1. Run `python game-riddler.py`
+1. Run `python main.py`
 2. Wait for game to formulate a riddle
 3. Type your answer when asked
 
 ### How to add questions
-1. Open `games.txt`
-2. Add a new game name as a new line
+1. Open any existing `.txt` file in the repository.
+2. Add a new title as a new line in the file.
+
+### Creating a new category
+If you created a new file a new file, open `config.toml` and make a new entry, e.g.
+      
+
+      [my-new-category]
+      model = "gpt-3.5-turbo"
+      temperature = 0.9
+      files = ["my-new-file.txt"]
+      system = "Make fluffy and cute riddles about what ever the user inputs."
+      prompt = "Without mentioning the name, make a riddle to which the answer is"
+      question = "Riddle me this!"
 
 ### To do
 - [ ] Add localisations
